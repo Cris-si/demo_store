@@ -1,0 +1,158 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}电商平台{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- 顶部导航条 -->
+    <div class="top-bar">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <span class="welcome-text">欢迎来到我们的商城！</span>
+                </div>
+                <div class="col-md-6">
+                    <ul class="top-links">
+                        {% if user.is_authenticated %}
+                            <li><a href="{% url 'accounts:profile' %}"><i class="fas fa-user"></i> {{ user.username }}</a></li>
+                            <li><a href="{% url 'cart:cart_detail' %}"><i class="fas fa-shopping-cart"></i> 购物车</a></li>
+                            <li><a href="{% url 'accounts:order_history' %}"><i class="fas fa-box"></i> 我的订单</a></li>
+                            <li><a href="{% url 'account_logout' %}"><i class="fas fa-sign-out-alt"></i> 退出</a></li>
+                        {% else %}
+                            <li><a href="{% url 'account_login' %}"><i class="fas fa-sign-in-alt"></i> 登录</a></li>
+                            <li><a href="{% url 'account_signup' %}"><i class="fas fa-user-plus"></i> 注册</a></li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主导航栏 -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'products:product_list' %}">
+                <img src="{% static 'images/logo.svg' %}" alt="Logo" height="40">
+            </a>
+            
+            <!-- 搜索框 -->
+            <div class="search-box">
+                <form class="d-flex" action="{% url 'products:product_list' %}" method="get">
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="搜索商品" name="q" value="{{ request.GET.q }}">
+                        <button class="btn btn-primary" type="submit">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'products:product_list' %}">
+                            <i class="fas fa-home"></i> 首页
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'cart:cart_detail' %}">
+                            <i class="fas fa-shopping-cart"></i> 购物车
+                            {% if cart.items.count %}
+                                <span class="badge">{{ cart.items.count }}</span>
+                            {% endif %}
+                        </a>
+                    </li>
+                    {% if user.is_authenticated %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-user"></i> {{ user.username }}
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{% url 'accounts:profile' %}">个人中心</a></li>
+                                <li><a class="dropdown-item" href="{% url 'accounts:order_history' %}">我的订单</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{% url 'account_logout' %}">退出</a></li>
+                            </ul>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 分类导航 -->
+    <div class="category-nav">
+        <div class="container">
+            <ul class="category-list">
+                <li><a href="{% url 'products:product_list' %}">全部商品</a></li>
+                {% for category in categories %}
+                    <li><a href="{{ category.get_absolute_url }}">{{ category.name }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <main class="container mt-4">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer class="footer mt-auto py-3">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <h5>关于我们</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#">公司简介</a></li>
+                        <li><a href="#">联系我们</a></li>
+                        <li><a href="#">招贤纳士</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h5>帮助中心</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#">购物指南</a></li>
+                        <li><a href="#">支付方式</a></li>
+                        <li><a href="#">配送方式</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h5>商家服务</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#">商家入驻</a></li>
+                        <li><a href="#">商家中心</a></li>
+                        <li><a href="#">运营服务</a></li>
+                    </ul>
+                </div>
+            </div>
+            <hr>
+            <div class="text-center">
+                <p class="mb-0">© 2025 电商平台 版权所有</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html> 

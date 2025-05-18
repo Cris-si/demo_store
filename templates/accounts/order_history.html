@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}订单历史 - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <!-- 左侧导航 -->
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex flex-column align-items-center text-center">
+                        <img src="{% static 'images/default-avatar.png' %}" alt="用户头像" class="rounded-circle" width="150">
+                        <div class="mt-3">
+                            <h4>{{ user.username }}</h4>
+                            <p class="text-muted">{{ user.email }}</p>
+                        </div>
+                    </div>
+                    <hr>
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'accounts:profile' %}">
+                                <i class="fas fa-user"></i> 个人资料
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="{% url 'accounts:order_history' %}">
+                                <i class="fas fa-shopping-bag"></i> 订单历史
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'accounts:edit_profile' %}">
+                                <i class="fas fa-cog"></i> 修改资料
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 右侧内容 -->
+        <div class="col-md-9">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0">订单历史</h4>
+                </div>
+                <div class="card-body">
+                    {% if orders %}
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>订单号</th>
+                                        <th>日期</th>
+                                        <th>状态</th>
+                                        <th>商品数量</th>
+                                        <th>总金额</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for order in orders %}
+                                    <tr>
+                                        <td>{{ order.order_number }}</td>
+                                        <td>{{ order.created_at|date:"Y-m-d H:i" }}</td>
+                                        <td>
+                                            <span class="badge {% if order.status == 'completed' %}bg-success{% elif order.status == 'processing' %}bg-primary{% else %}bg-secondary{% endif %}">
+                                                {{ order.get_status_display }}
+                                            </span>
+                                        </td>
+                                        <td>{{ order.items.count }}</td>
+                                        <td>¥{{ order.total_amount }}</td>
+                                        <td>
+                                            <a href="#" class="btn btn-sm btn-primary">查看详情</a>
+                                            {% if order.status == 'pending' %}
+                                                <button class="btn btn-sm btn-danger">取消订单</button>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- 分页 -->
+                        {% if is_paginated %}
+                        <nav class="mt-4" aria-label="订单分页">
+                            <ul class="pagination justify-content-center">
+                                {% if page_obj.has_previous %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">
+                                            <span aria-hidden="true">&laquo;</span>
+                                            <span class="sr-only">上一页</span>
+                                        </a>
+                                    </li>
+                                {% endif %}
+                                
+                                {% for num in page_obj.paginator.page_range %}
+                                    <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+                                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                                    </li>
+                                {% endfor %}
+                                
+                                {% if page_obj.has_next %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.next_page_number }}">
+                                            <span aria-hidden="true">&raquo;</span>
+                                            <span class="sr-only">下一页</span>
+                                        </a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                        {% endif %}
+                    {% else %}
+                        <div class="text-center py-5">
+                            <img src="{% static 'images/no-orders.png' %}" alt="暂无订单" class="mb-4" style="max-width: 200px;">
+                            <h5 class="text-muted">暂无订单记录</h5>
+                            <a href="{% url 'products:product_list' %}" class="btn btn-primary mt-3">
+                                去购物 <i class="fas fa-arrow-right"></i>
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

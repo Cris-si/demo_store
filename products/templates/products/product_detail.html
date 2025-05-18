@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ product.name }} - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'products:product_list' %}">商品列表</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'products:product_list' %}?category={{ product.category.slug }}">{{ product.category.name }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ product.name }}</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <!-- 商品图片 -->
+        <div class="col-md-6">
+            <div class="card border-0">
+                <img src="{% static 'images/products/'|add:product.name|lower|cut:' '|add:'.png' %}" 
+                     class="card-img-top" 
+                     alt="{{ product.name }}"
+                     style="max-height: 400px; object-fit: contain;">
+            </div>
+            {% if product.images.exists %}
+            <div class="row mt-3">
+                {% for image in product.images.all %}
+                <div class="col-3">
+                    <img src="{{ image.image.url }}" 
+                         class="img-thumbnail" 
+                         alt="{{ product.name }}"
+                         style="height: 100px; object-fit: cover;">
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- 商品信息 -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h1 class="card-title h2">{{ product.name }}</h1>
+                    <p class="text-muted">分类：{{ product.category.name }}</p>
+                    <h2 class="text-danger mb-4">¥{{ product.price }}</h2>
+                    
+                    <div class="mb-4">
+                        <h5>商品描述</h5>
+                        <p class="card-text">{{ product.description }}</p>
+                    </div>
+
+                    <div class="mb-4">
+                        <h5>库存状态</h5>
+                        {% if product.stock > 0 %}
+                        <p class="text-success">有货 (库存: {{ product.stock }})</p>
+                        {% else %}
+                        <p class="text-danger">暂时缺货</p>
+                        {% endif %}
+                    </div>
+
+                    {% if product.stock > 0 %}
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="input-group me-3" style="width: 150px;">
+                            <button class="btn btn-outline-secondary" type="button" id="decrease-quantity">-</button>
+                            <input type="number" class="form-control text-center" id="quantity" value="1" min="1" max="{{ product.stock }}">
+                            <button class="btn btn-outline-secondary" type="button" id="increase-quantity">+</button>
+                        </div>
+                        <button class="btn btn-primary add-to-cart" 
+                                data-product-id="{{ product.id }}"
+                                data-product-name="{{ product.name }}"
+                                data-product-price="{{ product.price }}">
+                            <i class="fas fa-shopping-cart"></i> 加入购物车
+                        </button>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // 数量增减按钮
+    $('#decrease-quantity').click(function() {
+        var input = $('#quantity');
+        var value = parseInt(input.val());
+        if (value > 1) {
+            input.val(value - 1);
+        }
+    });
+
+    $('#increase-quantity').click(function() {
+        var input = $('#quantity');
+        var value = parseInt(input.val());
+        var max = parseInt(input.attr('max'));
+        if (value < max) {
+            input.val(value + 1);
+        }
+    });
+
+    // 加入购物车
+    $('.add-to-cart').click(function() {
+        var productId = $(this).data('product-id');
+        var quantity = $('#quantity').val();
+        
+        $.ajax({
+            url: '{% url "cart:add_to_cart" %}',
+            method: 'POST',
+            data: {
+                'product_id': productId,
+                'quantity': quantity,
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            },
+            success: function(response) {
+                if (response.status === 'success') {
+                    updateCartIcon(response.cart_count);
+                    showMessage('success', '商品已添加到购物车');
+                } else {
+                    showMessage('error', response.message || '添加失败，请重试');
+                }
+            },
+            error: function() {
+                showMessage('error', '添加失败，请重试');
+            }
+        });
+    });
+});
+</script>
+{% endblock %} 
