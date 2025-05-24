@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}商品列表{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <!-- 分类侧边栏 -->
+        <div class="col-md-3">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">商品分类</h5>
+                </div>
+                <div class="list-group list-group-flush">
+                    <a href="{% url 'products:product_list' %}" 
+                       class="list-group-item list-group-item-action {% if not category %}active{% endif %}">
+                        全部商品
+                    </a>
+                    {% for cat in categories %}
+                    <a href="{% url 'products:product_list' %}?category={{ cat.slug }}" 
+                       class="list-group-item list-group-item-action {% if category.slug == cat.slug %}active{% endif %}">
+                        {{ cat.name }}
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- 商品列表 -->
+        <div class="col-md-9">
+            <div class="row row-cols-1 row-cols-md-3 g-4">
+                {% for product in products %}
+                <div class="col">
+                    <div class="card h-100">
+                        <img src="{% static 'images/products/'|add:product.name|lower|cut:' '|add:'.png' %}" 
+                             class="card-img-top" 
+                             alt="{{ product.name }}"
+                             style="height: 200px; object-fit: contain;">
+                        <p style="font-size:12px;color:#888;">图片路径：{% static 'images/products/'|add:product.name|lower|cut:' '|add:'.png' %}</p>
+                        <div class="card-body">
+                            <h5 class="card-title">{{ product.name }}</h5>
+                            <p class="card-text text-danger">¥{{ product.price }}</p>
+                            <a href="{% url 'products:product_detail' product.id %}" class="btn btn-primary">查看详情</a>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-12">
+                    <div class="alert alert-info">
+                        暂无商品
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

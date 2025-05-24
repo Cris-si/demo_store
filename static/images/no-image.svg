@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+    <style>
+        .bg { fill: #f5f5f5; }
+        .icon { fill: #cccccc; }
+        .text { font: 14px sans-serif; fill: #999; }
+    </style>
+    <rect width="200" height="200" class="bg"/>
+    <path d="M80 60h40v40H80z" class="icon"/>
+    <path d="M60 120h80v20H60z" class="icon"/>
+    <text x="100" y="170" text-anchor="middle" class="text">暂无图片</text>
+</svg> 

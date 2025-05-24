@@ -1,0 +1,33 @@
+<div class="card mb-3">
+    <div class="card-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">订单号：{{ order.order_number }}</h5>
+            <span class="badge {% if order.status == 'completed' %}bg-success{% elif order.status == 'pending' %}bg-warning{% else %}bg-secondary{% endif %}">
+                {{ order.get_status_display }}
+            </span>
+        </div>
+    </div>
+    <div class="card-body">
+        {% for item in order.items.all %}
+        <div class="d-flex mb-3">
+            <img src="{{ item.product.get_image_url }}" alt="{{ item.product.name }}" class="me-3" style="width: 80px; height: 80px; object-fit: cover;">
+            <div class="flex-grow-1">
+                <h6 class="mb-1">{{ item.product.name }}</h6>
+                <p class="mb-1">数量：{{ item.quantity }}</p>
+                <p class="mb-1">单价：¥{{ item.price }}</p>
+                {% if order.status == 'completed' %}
+                    {% if item.product.reviews.filter.user == request.user %}
+                        <span class="badge bg-success">已评价</span>
+                    {% else %}
+                        <a href="{% url 'products:product_detail' item.product.id %}#review-form" class="btn btn-sm btn-outline-primary">去评价</a>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+        <div class="text-end">
+            <p class="mb-1">总金额：¥{{ order.total_amount }}</p>
+            <p class="mb-0 text-muted">下单时间：{{ order.created_at|date:"Y-m-d H:i" }}</p>
+        </div>
+    </div>
+</div> 

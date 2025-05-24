@@ -1,0 +1,18 @@
+{% for order in orders %}
+    {% for item in order.items.all %}
+    <tr>
+        <td>
+            <div class="d-flex align-items-center">
+                <img src="{{ item.product.get_image_url }}" alt="{{ item.product.name }}" class="img-thumbnail" style="width: 80px; margin-right: 15px;">
+                <div>
+                    <h6 class="mb-0">{{ item.product.name }}</h6>
+                    <small class="text-muted">{{ item.product.category.name }}</small>
+                </div>
+            </div>
+        </td>
+        <td>¥{{ item.price }}</td>
+        <td>{{ item.quantity }}</td>
+        <td>¥{{ item.total_price }}</td>
+    </tr>
+    {% endfor %}
+{% endfor %} 

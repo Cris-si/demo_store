@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}购物车{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">购物车</h2>
+    
+    {% if cart_items %}
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>商品</th>
+                            <th>单价</th>
+                            <th>数量</th>
+                            <th>小计</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in cart_items %}
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="img-thumbnail" style="width: 80px;">
+                                    <div class="ms-3">
+                                        <h6 class="mb-0">{{ item.product.name }}</h6>
+                                        <small class="text-muted">库存: {{ item.product.stock }}</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>¥{{ item.product.price }}</td>
+                            <td>
+                                <form method="post" action="{% url 'cart:update_cart' item.id %}" class="d-flex align-items-center">
+                                    {% csrf_token %}
+                                    <input type="number" name="quantity" value="{{ item.quantity }}" min="1" max="{{ item.product.stock }}" class="form-control form-control-sm" style="width: 70px;">
+                                    <button type="submit" class="btn btn-sm btn-outline-primary ms-2">更新</button>
+                                </form>
+                            </td>
+                            <td>¥{{ item.subtotal }}</td>
+                            <td>
+                                <form method="post" action="{% url 'cart:remove_from_cart' item.id %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-danger">删除</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="3" class="text-end"><strong>总计:</strong></td>
+                            <td><strong>¥{{ total_price }}</strong></td>
+                            <td></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+            
+            <div class="d-flex justify-content-between mt-4">
+                <a href="{% url 'products:product_list' %}" class="btn btn-outline-primary">继续购物</a>
+                <a href="{% url 'orders:checkout' %}" class="btn btn-primary">去结算</a>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+        <img src="{% static 'images/empty-cart.png' %}" alt="空购物车" class="mb-4" style="width: 200px;">
+        <h4>购物车是空的</h4>
+        <p class="text-muted">快去选购心仪的商品吧！</p>
+        <a href="{% url 'products:product_list' %}" class="btn btn-primary mt-3">去购物</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %} 

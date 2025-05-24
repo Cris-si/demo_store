@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="200" height="60" viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg">
+    <style>
+        .title { font: bold 24px sans-serif; fill: #ff4400; }
+        .subtitle { font: 14px sans-serif; fill: #666; }
+    </style>
+    <rect width="200" height="60" fill="white"/>
+    <text x="10" y="35" class="title">91</text>
+    <text x="80" y="35" class="subtitle">SHOP</text>
+</svg> 

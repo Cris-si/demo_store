@@ -1,0 +1,48 @@
+<div class="card-body">
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>商品</th>
+                    <th>单价</th>
+                    <th>数量</th>
+                    <th>小计</th>
+                    <th>评价</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in order.items.all %}
+                <tr>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <img src="{{ item.product.get_image_url }}" alt="{{ item.product.name }}" class="img-thumbnail" style="width: 80px; margin-right: 15px;">
+                            <div>
+                                <h6 class="mb-0">{{ item.product.name }}</h6>
+                                <small class="text-muted">{{ item.product.category.name }}</small>
+                            </div>
+                        </div>
+                    </td>
+                    <td>¥{{ item.price }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>¥{{ item.subtotal }}</td>
+                    <td>
+                        {% if order.status == 'completed' %}
+                            {% if item.product.reviews.filter.user == request.user %}
+                                <span class="badge bg-success">已评价</span>
+                            {% else %}
+                                <a href="{% url 'products:product_detail' item.product.id %}#review-form" class="btn btn-sm btn-outline-primary">去评价</a>
+                            {% endif %}
+                        {% else %}
+                            <span class="text-muted">待收货后评价</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="text-end mt-3">
+        <p class="mb-1">商品总数：{{ order.items.count }} 件</p>
+        <h4 class="text-danger">订单总额：¥{{ order.total_amount }}</h4>
+    </div>
+</div> 

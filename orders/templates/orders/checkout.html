@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load product_filters %}
+
+{% block title %}订单提交{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">订单提交</h2>
+    
+    <div class="row">
+        <!-- 商品列表 -->
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">商品清单</h5>
+                </div>
+                <div class="card-body">
+                    <div class="order-items">
+                        {% for item in cart_items %}
+                        <div class="order-item">
+                            <div class="row align-items-center">
+                                <div class="col-md-2">
+                                    {% if item.product.image %}
+                                        <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="img-thumbnail" style="width: 80px;">
+                                    {% else %}
+                                        <img src="{% static 'images/products/' %}{{ item.product.name|format_image_name }}.png"
+                                             alt="{{ item.product.name }}"
+                                             class="img-thumbnail"
+                                             style="width: 80px;"
+                                             onerror="this.onerror=null; this.src='{% static 'images/no-image.svg' %}'">
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-4">
+                                    <h5 class="mb-0">{{ item.product.name }}</h5>
+                                    <p class="text-muted mb-0">数量: {{ item.quantity }}</p>
+                                </div>
+                                <div class="col-md-3">
+                                    <p class="mb-0">单价: ¥{{ item.product.price }}</p>
+                                </div>
+                                <div class="col-md-3 text-end">
+                                    <p class="mb-0">小计: ¥{{ item.total_price }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 订单信息 -->
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">订单信息</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="{% url 'orders:checkout' %}">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="name" class="form-label">收货人姓名</label>
+                            <input type="text" class="form-control" id="name" name="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="phone" class="form-label">联系电话</label>
+                            <input type="tel" class="form-control" id="phone" name="phone" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="address" class="form-label">收货地址</label>
+                            <textarea class="form-control" id="address" name="address" rows="3" required></textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">支付方式</label>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="radio" name="payment_method" id="alipay" value="alipay" checked>
+                                <label class="form-check-label d-flex align-items-center" for="alipay">
+                                    <img src="{% static 'images/alipay.png' %}" alt="支付宝" style="height: 24px; margin-right: 10px;">
+                                    <span>支付宝</span>
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="payment_method" id="wechat" value="wechat">
+                                <label class="form-check-label d-flex align-items-center" for="wechat">
+                                    <img src="{% static 'images/wechat.png' %}" alt="微信支付" style="height: 24px; margin-right: 10px;">
+                                    <span>微信支付</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>商品总数：</span>
+                                    <span>{{ cart_items|length }} 件</span>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>商品总价：</span>
+                                    <span>¥{{ total_price }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>运费：</span>
+                                    <span>¥0.00</span>
+                                </div>
+                                <hr>
+                                <div class="d-flex justify-content-between">
+                                    <span class="h5">应付总额：</span>
+                                    <span class="h5 text-danger">¥{{ total_price }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary w-100">提交订单</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
